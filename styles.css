@@ -9,3 +9,16 @@ img{
 .verde{
     background-color: green;
 }
+
+#reload{
+    margin: 5px;
+    max-width: 100px;
+    border-radius: 10%;
+    border: 0px;
+    
+}
+
+#clock{
+    font-size: 28px;
+    font-family: monospace;
+}

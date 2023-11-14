@@ -10,15 +10,42 @@ function start() {
     let pointsContainer = document.querySelector('#points');
     let ruteImgs = "./assets/imgs/michi";
     let ruteImgBack = './assets/imgs/back.jpg';
+    let arrayImagenes = cardsContainer.querySelectorAll('img');
     let arrCardsGame = [];
     let arrCardsDome = [];
+    let reloadButton = document.querySelector('#reload');
+    let clock = document.querySelector('#clock');
+    let secods = 0;
+    let secondsFormat;
+    let minutesFormat;
+    let minutes = 0;
+    let intervaloTemp;
+    let arrGameTime = [];       //Array con los tiempos de las partidas
+    let nPartida=1;
+    let gameList = document.querySelector('#gameList');
 
     cardsContainer.addEventListener('click', turninImgs);
-    pointsContainer.innerHTML=points;
+    pointsContainer.innerHTML = points;
+
+    intervaloTemp = setInterval(function () {
+        if (points < 3) {
+            secods++
+            if (secods == 60) {
+                secods = 0;
+                minutes++;
+            }
+            secondsFormat = secods.toLocaleString('en-US', { minimumIntegerDigits: 2 })
+            minutesFormat = minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })
+            updateClock();
+        }
+    }, 1000)
+
+    reloadButton.addEventListener('click', reloadGame);
+
 
     function turninImgs(event) {
 
-        if (event.target.tagName === "IMG") {           //Solo si se trata de imágenes
+        if (event.target.tagName === "IMG" && event.target.src.includes('back')) {           //Solo si se trata de imágenes 
             event.target.src = ruteImgs + ordenCartas[event.target.id] + ".jpg";  //muestra la carta que corresponda
             if (arrCardsGame.length < 2) {        //Si hay menos de dos cartas en el array
                 arrCardsGame.push(event.target); // Se almacena en el array
@@ -26,10 +53,9 @@ function start() {
             }
             if (arrCardsGame.length == 2) {
                 checkImgs(arrCardsGame);
-                cardsContainer.style.pointerEvents='none';
+                cardsContainer.style.pointerEvents = 'none';
             }
 
-            console.log(arrCardsGame)
         }
     }
 
@@ -45,15 +71,42 @@ function start() {
                 arrCardsDome.push(arrCardsGame[1]);
                 arrCardsGame = []; // Se vacía el array
                 points++;
-                pointsContainer.innerHTML=points;
-                if(points==3){
+                pointsContainer.innerHTML = points;
+                if (points == 3) {
+                    arrGameTime.push({nPartida: nPartida, minutes:minutesFormat, secods:secondsFormat});
                     alert('Enhorabuena, has ganado.');
+                    nPartida++;
+
+                    let newGame = document.createElement('li');
+                    newGame.innerHTML = 'Partida Nº ' + arrGameTime[arrGameTime.length-1].nPartida + '. Tiempo: '+ arrGameTime[arrGameTime.length-1].minutes + ':' + arrGameTime[arrGameTime.length-1].secods;
+                    gameList.appendChild(newGame);
                 }
             }
-            cardsContainer.style.pointerEvents='auto';
-            
+            cardsContainer.style.pointerEvents = 'auto';
 
-        }, 2000);
+
+        }, 500);
+
+    }
+
+    function reloadGame() {
+        ordenCartas = arrNums.sort(randomCompare);
+        for (let i = 0; i < arrayImagenes.length; i++) {
+            arrayImagenes[i].src = './assets/imgs/back.jpg';
+
+        }
+        arrCardsGame = [];
+        arrCardsDome = [];
+        points = 0;
+        secods = 0;
+        minutes = 0;
+        pointsContainer.innerHTML = points;
+    }
+
+    function updateClock() {
+
+
+        clock.innerHTML = minutesFormat + ':' + secondsFormat;
 
     }
 
